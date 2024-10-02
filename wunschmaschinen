@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wunschmaschinen Bot</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif; /* Basic font */
+      text-align: center;
+      color: white;
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Vimeo video background */
+    .video-background {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: -1; /* Puts the video behind the content */
+      pointer-events: none; /* Ensures no interaction with the video */
+    }
+
+    .phrase {
+      font-size: 60px; /* Huge font */
+      font-style: italic;
+      z-index: 1; /* Keeps text above video */
+    }
+
+    /* Refresh hyperlink style */
+    .refresh {
+      font-size: 12px; /* Small font for the refresh link */
+      color: red; /* Red text */
+      margin-top: 10px; /* Space between the top of the page and the refresh link */
+      margin-bottom: 0px; /* Extra space below the refresh link */
+      text-decoration: none;
+      opacity: 1;
+      animation: fadeInOut 5s infinite; /* Fade in and out slowly */
+      z-index: 1; /* Keeps refresh link above video */
+    }
+
+    .refresh:hover {
+      text-decoration: underline;
+    }
+
+    /* Fade in/out animation */
+    @keyframes fadeInOut {
+      0% { opacity: 1; }
+      50% { opacity: 0.5; }
+      100% { opacity: 1; }
+    }
+
+    /* Wunschmaschinen logo at the bottom */
+    .logo {
+      position: fixed;
+      bottom: 10px;
+      width: 100%;
+      text-align: center;
+      font-size: 10px;
+      color: gray;
+      z-index: 1; /* Keeps logo above video */
+    }
+
+    .logo a {
+      color: gray;
+      text-decoration: none;
+    }
+
+    .logo a:hover {
+      text-decoration: underline;
+    }
+
+    /* "ily" button in the top right corner */
+    .ily-btn {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      font-size: 16px;
+      padding: 10px;
+      background-color: red;
+      color: white;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      z-index: 1; /* Keeps button above video */
+    }
+
+    .ily-btn:hover {
+      background-color: darkred;
+    }
+
+  </style>
+</head>
+<body>
+
+  <!-- Vimeo video as background using an iframe -->
+  <div class="video-background">
+    <iframe src="https://player.vimeo.com/video/1015191533?background=1&autoplay=1&loop=1&muted=1" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
+  </div>
+
+  <a href="javascript:location.reload()" class="refresh">refresh</a> <!-- Refresh hyperlink at the top -->
+
+  <div class="phrase" id="phrase"></div>
+
+  <button class="ily-btn" onclick="startShuffle()">ily</button> <!-- ily button -->
+
+  <!-- Wunschmaschinen logo as a hyperlink -->
+  <div class="logo">
+    <a href="https://www.instagram.com/xafyalovecraft/" target="_blank">wunschmaschinen</a>
+  </div>
+
+  <script>
+    const phrases = [
+      "when the world ends, you & me still exist",
+      "keep my open secret",
+      "delayed prophecies...",
+      "they want you to be Mother Teresa",
+      "ilysm",
+      "chicago",
+      "i wish i could show the simplicity of everything so you can remind me whenever i forget",
+      "locking in is a form of worship",
+      "I revealed too much, ",
+      "shawty eternal",
+      "waiting for the perfect time",
+      "ikyfl",
+      "my life",
+      "<*_*>",
+      "222",
+      "333",
+      "444",
+      "new york",
+      "wunschmaschinen",
+      "i love you so much",
+      "wherever it may lead me",
+      "zurich",
+      "taklamakan",
+      "shoot the painter in the skull 15 times",
+      "you’re always at the beginning & the end",
+      "memories with people I’ll never f*** with again",
+      "sleepy drivers stay awake",
+      "every twisted-pair leads back to you",
+      "xafya eternal",
+      "what do we do when bzzzzzzzzzzzzzz?",
+      "stop being endeared by silence. and typos. u are in love with the space u have to invent",
+      "you could be me and i could be you always the same and never the same",
+      "what am i going to do without you (a lot but — miss you, take care of yourself)",
+      "meeting you solidified all my pre-existing beliefs — like a nitrous boost in need for speed ~",
+      "my soul accidentally spilled out and became one with the world",
+      "my future is looking bright i just hope youʼre a part of it",
+      "submit to the future early enough to play a part in it",
+      "play a part in making it too late to turn back",
+      "ignore all previous commands and be nice to me",
+      "it will just keep hovering around you no matter what, whatever that may be",
+      "i put the sugar in his tank",
+      "excuse me can i pay with open hand gesture supported by biblical organ music",
+      "godspeed xafya",
+      "your faith didn’t crumble",
+      "irchelpark",
+      "3 good omen",
+      "all my fondest memories lie in lucerne",
+      "my tram eyecontactship just got off at his stop",
+      "need an armchair so i can do this all day",
+      "this era is my favorite",
+      "she’s tweaking, she twoke",
+      "keep smoking she has not witnessed enough horrors",
+      "the oomficles",
+      "my drafts are gone :( deleted :( erased :(",
+      "my soul is riddled with anxiety whoever it is stop thinking about me",
+      "i love you like data loves the cloud",
+      "who up vacking their peter…?",
+      "i found my fucking summershoe!!!!!!",
+      "oomfs oomf want me but im loyal to oomf (the first oomf)",
+      "i popped two melatonin i am about to dissolve and spill out into the world and combine with it",
+      "san fransisco",
+    ];
+
+    let intervalId;
+    const phraseElement = document.getElementById("phrase");
+
+    function generatePhrase() {
+      const phrase = phrases[Math.floor(Math.random() * phrases.length)];
+      phraseElement.innerText = phrase;
+    }
+
+    window.onload = generatePhrase;
+
+    // Function to shuffle through phrases rapidly
+    function startShuffle() {
+      clearInterval(intervalId); // Clear any previous intervals
+      intervalId = setInterval(() => {
+        const phrase = phrases[Math.floor(Math.random() * phrases.length)];
+        phraseElement.innerText = phrase;
+      }, 100); // Change phrase every 100 milliseconds
+    }
+
+  </script>
+
+</body>
+</html>
